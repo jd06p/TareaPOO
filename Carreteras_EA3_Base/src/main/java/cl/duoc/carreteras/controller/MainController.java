@@ -2,6 +2,7 @@ package cl.duoc.carreteras.controller;
 
 import cl.duoc.carreteras.dao.CarreteraDAO;
 import cl.duoc.carreteras.dao.PersistenciaException;
+import cl.duoc.carreteras.dao.OracleCarreteraDAO;
 import cl.duoc.carreteras.model.Carretera;
 import cl.duoc.carreteras.model.CarreteraConcesionada;
 import cl.duoc.carreteras.model.CarreteraEstatal;
@@ -18,6 +19,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
+
 import java.util.Locale;
 
 /**
@@ -31,7 +33,7 @@ public class MainController {
     //      (por ejemplo: = new MiImplementacionDAO();).
     //      No es necesario modificar ninguna otra parte de esta clase.
     // =====================================================================
-    private final CarreteraDAO dao = null;
+    private final CarreteraDAO dao = new OracleCarreteraDAO();
 
     private static final Locale LOCALE_CL = Locale.forLanguageTag("es-CL");
 
