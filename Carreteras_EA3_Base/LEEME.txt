@@ -1,0 +1,81 @@
+RED VIAL - PROYECTO BASE EA3
+============================
+
+Ejecución: clase cl.duoc.carreteras.Launcher (o mvn javafx:run).
+Mientras no asignes tu implementación de CarreteraDAO, la ventana se abre
+y el área de mensajes indica que aún no hay una implementación asignada.
+
+
+ESTRUCTURA
+----------
+cl.duoc.carreteras
+  Launcher, App              Inicio de la aplicación (no modificar).
+  model/                     Carretera, CarreteraConcesionada, CarreteraEstatal,
+                             PeajeTag (no modificar).
+  dao/                       CarreteraDAO y PersistenciaException (no modificar).
+  conexion/ConexionBD        Datos de conexión: COMPLETAR.
+  controller/MainController  Controlador de la ventana: asignar el DAO
+                             (marca "EA3"); no modificar el resto.
+resources/cl/duoc/carreteras/view
+  main-view.fxml             Ventana principal (no modificar).
+pom.xml                      Agregar el conector JDBC (marca "EA3").
+scripts/                     carreteras_mysql.sql y carreteras_oracle.sql:
+                             ejecuta el de tu motor (no modificar).
+
+
+MODELO
+------
+Carretera (abstracta)
+  int getId() / void setId(int id)                      0 mientras no está almacenada.
+  String getCodigo() / setCodigo(String)                No nulo ni vacío.
+  int getNumeroPistas() / setNumeroPistas(int)          Pistas por sentido, entre 1 y 8.
+  double getLongitudKm() / setLongitudKm(double)        Mayor que cero.
+  String getTipo()                                      "Concesionada" o "Estatal".
+  double calcularCostoMantencion()                      Costo anual de mantención por km.
+  Los set lanzan IllegalArgumentException con un mensaje si el dato es inválido.
+
+CarreteraConcesionada extends Carretera implements PeajeTag
+  CarreteraConcesionada(String codigo, int numeroPistas, double longitudKm,
+                        double tarifaPeaje, boolean iluminada)
+  double getTarifaPeaje() / setTarifaPeaje(double)      Mayor que cero.
+  boolean isIluminada() / setIluminada(boolean)
+  boolean isTagHabilitado() / setTagHabilitado(boolean) (de PeajeTag)
+  Costo de mantención por km: $18.000.000; +20% si está iluminada.
+
+CarreteraEstatal extends Carretera
+  CarreteraEstatal(String codigo, int numeroPistas, double longitudKm, double altitudMaxima)
+  double getAltitudMaxima() / setAltitudMaxima(double)  Metros; mayor que cero.
+  Costo de mantención por km: $9.000.000; +30% si la altitud máxima supera 2.000 m.
+
+PeajeTag (interfaz)
+  boolean isTagHabilitado()
+  void setTagHabilitado(boolean)
+
+
+ACCESO A DATOS
+--------------
+CarreteraDAO (interfaz)
+  List<Carretera> obtenerTodos()   Todas las carreteras, cada una como
+                                   CarreteraConcesionada o CarreteraEstatal,
+                                   con todos sus datos y su id.
+  void insertar(Carretera c)       Guarda una carretera nueva (el id lo genera la BD).
+  void actualizar(Carretera c)     Modifica la carretera con el mismo id.
+  void eliminar(int id)            Elimina la carretera con ese id.
+  Todas lanzan PersistenciaException si la operación no puede completarse.
+
+PersistenciaException(String mensaje)
+PersistenciaException(String mensaje, Throwable causa)
+  La ventana muestra getMessage() en el área de mensajes.
+
+ConexionBD
+  static Connection getConnection() throws SQLException
+  Entrega una conexión abierta con los datos URL, USUARIO y CLAVE.
+  Quien la utiliza debe cerrarla.
+
+
+BASE DE DATOS
+-------------
+tipo_carretera (id_tipo, descripcion)       1 = Concesionada, 2 = Estatal
+carretera      (id, id_tipo, codigo, numero_pistas, longitud_km,
+                tarifa_peaje, iluminada, tag_habilitado,     <- solo Concesionada
+                altitud_maxima)                              <- solo Estatal
